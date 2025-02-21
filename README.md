@@ -15,4 +15,4 @@ This project is my submission for the Kagi macOS Demo. It is a macOS application
 
 ## Demo
 
-<video src="kagi-demo.mp4" controls></video>
+https://github.com/user-attachments/assets/59cf4c4a-29d5-4688-b009-41f937429648
