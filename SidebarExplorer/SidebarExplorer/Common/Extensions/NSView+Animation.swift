@@ -7,50 +7,6 @@
 import AppKit
 
 extension NSView {
-    func slideReplace(with newView: NSView, direction: NSRectEdge, duration: TimeInterval = 0.2) {
-        guard let superview = self.superview else { return }
-        
-        self.wantsLayer = true
-        newView.wantsLayer = true
-        let currentFrame = self.frame
-        
-        superview.addSubview(newView)
-        newView.frame = currentFrame
-        let offset = direction == .maxX ? currentFrame.width : -currentFrame.width
-        newView.layer?.position.x -= offset
-        
-        let currentViewAnimation = CABasicAnimation(keyPath: "position.x")
-        currentViewAnimation.fromValue = self.layer?.position.x
-        currentViewAnimation.toValue = (self.layer?.position.x ?? 0) + offset
-        
-        let newViewAnimation = CABasicAnimation(keyPath: "position.x")
-        newViewAnimation.fromValue = newView.layer?.position.x
-        newViewAnimation.toValue = (newView.layer?.position.x ?? 0) + offset
-
-        let animations = [currentViewAnimation, newViewAnimation]
-        for animation in animations {
-            animation.duration = duration
-            animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            animation.fillMode = .forwards
-            animation.isRemovedOnCompletion = false
-        }
-        
-        self.layer?.add(currentViewAnimation, forKey: "slideOut")
-        newView.layer?.add(newViewAnimation, forKey: "slideIn")
-        
-        self.layer?.position.x += offset
-        newView.layer?.position.x += offset
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + duration) { [weak self] in
-            self?.removeFromSuperview()
-        }
-    }
-    
-    enum SlideType {
-        case `in`
-        case out
-    }
-    
     func addWithZoomAnimation(
         to stackView: NSStackView,
         at index: Int,
@@ -137,17 +93,6 @@ extension NSView {
         }
     }
     
-    func animateConstraint(_ constraint: NSLayoutConstraint,
-                           to constant: CGFloat,
-                           duration: TimeInterval = 0.2)
-    {
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = duration
-            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            constraint.animator().constant = constant
-        }
-    }
-    
     func animateConstraints(
         constants: [(NSLayoutConstraint, CGFloat)] = [],
         duration: TimeInterval = 0.2
@@ -163,5 +108,17 @@ extension NSView {
         } completionHandler: {
             self.window?.layoutIfNeeded()
         }
+    }
+    
+    func slideTransition(type: CATransitionType = .push,
+                        direction: CATransitionSubtype,
+                        duration: TimeInterval = 0.3) {
+        wantsLayer = true
+        let transition = CATransition()
+        transition.type = type
+        transition.subtype = direction
+        transition.duration = duration
+        transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        layer?.add(transition, forKey: "slideTransition")
     }
 }

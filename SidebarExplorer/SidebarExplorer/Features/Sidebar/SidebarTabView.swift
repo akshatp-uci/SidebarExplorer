@@ -27,7 +27,7 @@ class SidebarTabView: NSView {
     private var currentButtons: [SidebarTabButtonView] = []
     
     private var maxExpandedButtonCount: Int {
-        return Int(floor(stackBackgroundView.bounds.width / 30))
+        return Int(floor(stackBackgroundView.bounds.width / 26))
     }
     
     private var maxCompressedButtonCount: Int {
@@ -59,7 +59,7 @@ class SidebarTabView: NSView {
         // Setup stack view as the root view
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.orientation = .horizontal
-        stackView.spacing = 4
+        stackView.spacing = 6
         stackView.alignment = .centerY
         stackView.distribution = .equalCentering
         stackView.setClippingResistancePriority(.defaultLow, for: .horizontal)
@@ -124,11 +124,17 @@ class SidebarTabView: NSView {
     override func setFrameSize(_ newSize: NSSize) {
         super.setFrameSize(newSize)
         updateButtonStates()
+        
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.1
+            context.allowsImplicitAnimation = true
+            stackView.layoutSubtreeIfNeeded()
+        }
     }
     
     private func updateButtonStates() {
         if currentButtons.count < maxExpandedButtonCount {
-            stackView.spacing = 4
+            stackView.spacing = 6
             for button in currentButtons {
                 button.canCollapse = false
                 button.isCollapsed = false
@@ -138,7 +144,7 @@ class SidebarTabView: NSView {
                 button.update()
             }
         } else if currentButtons.count >= maxExpandedButtonCount && currentButtons.count <= maxCompressedButtonCount {
-            stackView.spacing = -4
+            stackView.spacing = 0
             for button in currentButtons {
                 button.canCollapse = true
                 button.isCollapsed = true
@@ -148,7 +154,7 @@ class SidebarTabView: NSView {
                 button.update()
             }
         } else if currentButtons.count > maxCompressedButtonCount {
-            stackView.spacing = -4
+            stackView.spacing = 0
             for button in currentButtons {
                 button.canCollapse = true
                 button.isCollapsed = true
@@ -158,7 +164,7 @@ class SidebarTabView: NSView {
                 button.update()
             }
             
-            var remainingButtonCount = maxCompressedButtonCount - 2
+            var remainingButtonCount = maxCompressedButtonCount - 1
             for button in currentButtons.reversed() {
                 if !button.isSelected && stackView.views.contains(button) {
                     if remainingButtonCount > 0 {

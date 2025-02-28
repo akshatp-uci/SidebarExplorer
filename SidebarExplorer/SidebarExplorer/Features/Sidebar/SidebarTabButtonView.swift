@@ -68,8 +68,8 @@ class SidebarTabButtonView: NSView {
             button.leadingAnchor.constraint(equalTo: leadingAnchor),
             button.trailingAnchor.constraint(equalTo: trailingAnchor),
             button.bottomAnchor.constraint(equalTo: bottomAnchor),
-            button.widthAnchor.constraint(equalToConstant: 26),
-            button.heightAnchor.constraint(equalToConstant: 26)
+            button.widthAnchor.constraint(equalToConstant: 22),
+            button.heightAnchor.constraint(equalToConstant: 22)
         ])
         
         setupTrackingArea()
@@ -117,13 +117,11 @@ class SidebarTabButtonView: NSView {
         }
         
         if canCollapse && isCollapsed && !isSelected {
-            button.image = NSImage(systemSymbolName: "circlebadge.fill", accessibilityDescription: workspace.name)
-            button.layer?.anchorPoint = CGPoint(x: -0.5, y: -0.5)
-            button.layer?.setAffineTransform(CGAffineTransform(scaleX: 0.5, y: 0.5))
+            button.image = NSImage(systemSymbolName: "circlebadge.fill", accessibilityDescription: workspace.name)?
+                .withSymbolConfiguration(.init(pointSize: 6, weight: .regular))
         } else {
-            button.image = NSImage(systemSymbolName: workspace.icon, accessibilityDescription: workspace.name)
-            button.layer?.anchorPoint = CGPoint(x: 0, y: 0)
-            button.layer?.setAffineTransform(CGAffineTransform(scaleX: 1, y: 1))
+            button.image = NSImage(systemSymbolName: workspace.icon, accessibilityDescription: workspace.name)?
+                .withSymbolConfiguration(.init(pointSize: 14, weight: .regular))
         }
     }
     
@@ -145,8 +143,8 @@ class SidebarTabButtonView: NSView {
         
         let menu = NSMenu()
         let deleteItem = NSMenuItem(title: "Delete",
-                                  action: #selector(deleteWorkspace),
-                                  keyEquivalent: "")
+                                    action: #selector(deleteWorkspace),
+                                    keyEquivalent: "")
         deleteItem.image = NSImage(systemSymbolName: "trash", accessibilityDescription: "Delete Workspace")
         deleteItem.target = self
         deleteItem.setAccessibilityIdentifier("Delete Workspace")

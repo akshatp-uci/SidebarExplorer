@@ -60,7 +60,7 @@ extension AppCoordinator: NSToolbarDelegate {
         case NSToolbarItem.Identifier("Title"):
             let item = NSToolbarItem(itemIdentifier: itemIdentifier)
             let label = NSTextField(labelWithString: "Sidebar Explorer")
-            label.font = NSFont.titleBarFont(ofSize: 14)
+            label.font = NSFont.systemFont(ofSize: 15, weight: .bold)
             label.textColor = .labelColor
             item.view = label
             return item

@@ -25,7 +25,6 @@ class WorkspaceView: NSView {
     
     private let titleLabel = NSTextField(labelWithString: "")
     private let pinnedItemCollectionView = NSCollectionView()
-    private let pinnedItemScrollView = NSScrollView()
     private let itemListTableView = NSTableView()
     private let itemListScrollView = ForwardingScrollView()
     
@@ -69,11 +68,11 @@ class WorkspaceView: NSView {
         pinnedItemCollectionView.translatesAutoresizingMaskIntoConstraints = false
         
         let flowLayout = NSCollectionViewFlowLayout()
-        flowLayout.scrollDirection = .horizontal
-        flowLayout.itemSize = NSSize(width: 50, height: 50)
+        flowLayout.scrollDirection = .vertical
+        flowLayout.itemSize = NSSize(width: 56, height: 50)
         flowLayout.minimumInteritemSpacing = 8
         flowLayout.minimumLineSpacing = 8
-        flowLayout.sectionInset = NSEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
+        flowLayout.sectionInset = NSEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
         
         pinnedItemCollectionView.collectionViewLayout = flowLayout
         pinnedItemCollectionView.delegate = self
@@ -89,18 +88,10 @@ class WorkspaceView: NSView {
         contextMenu.delegate = self
         pinnedItemCollectionView.menu = contextMenu
         
-        // Configure scroll view
-        pinnedItemScrollView.translatesAutoresizingMaskIntoConstraints = false
-        pinnedItemScrollView.hasVerticalScroller = false
-        pinnedItemScrollView.hasHorizontalScroller = true
-        pinnedItemScrollView.autohidesScrollers = false
-        pinnedItemScrollView.documentView = pinnedItemCollectionView
-        pinnedItemScrollView.drawsBackground = false
-        pinnedItemScrollView.horizontalScrollElasticity = .none
+        // Initialize height constraint
+        pinnedItemsHeightConstraint = pinnedItemCollectionView.heightAnchor.constraint(equalToConstant: 0)
         
-        // Adjust scroll view height to accommodate content and scroll bar
-        pinnedItemsHeightConstraint = pinnedItemScrollView.heightAnchor.constraint(equalToConstant: 0)
-        addSubview(pinnedItemScrollView)
+        addSubview(pinnedItemCollectionView)
     }
     
     private func createPinnedItemsContextMenu() -> NSMenu {
@@ -136,7 +127,7 @@ class WorkspaceView: NSView {
         itemListScrollView.hasVerticalScroller = true
         itemListScrollView.autohidesScrollers = true
         itemListScrollView.drawsBackground = false
-        itemListScrollView.verticalScrollElasticity = .none
+        itemListScrollView.verticalScrollElasticity = .allowed
         
         addSubview(itemListScrollView)
     }
@@ -147,12 +138,12 @@ class WorkspaceView: NSView {
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             
-            pinnedItemScrollView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
-            pinnedItemScrollView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
-            pinnedItemScrollView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
+            pinnedItemCollectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            pinnedItemCollectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            pinnedItemCollectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
             pinnedItemsHeightConstraint,
             
-            itemListScrollView.topAnchor.constraint(equalTo: pinnedItemScrollView.bottomAnchor, constant: 4),
+            itemListScrollView.topAnchor.constraint(equalTo: pinnedItemCollectionView.bottomAnchor, constant: 4),
             itemListScrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             itemListScrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
             itemListScrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
@@ -182,8 +173,15 @@ class WorkspaceView: NSView {
     }
     
     func updatePinnedItemsArea(_ items: [WorkspaceItem], animated: Bool = true) {
+        let availableWidth = bounds.width - 4
+        let itemWidth: CGFloat = 56
+        let itemSpacing: CGFloat = 8
+        let itemsPerRow = max(1, Int((availableWidth - itemSpacing) / (itemWidth + itemSpacing)))
+        let numberOfRows = Int(ceil(Float(items.count) / Float(itemsPerRow)))
+        let totalHeight = items.isEmpty ? 0 : CGFloat(numberOfRows * 58 + 8)
+        
         animateConstraints(
-            constants: [(pinnedItemsHeightConstraint, items.isEmpty ? 0 : 76)],
+            constants: [(pinnedItemsHeightConstraint, totalHeight)],
             duration: animated ? 0.2 : 0.0
         )
     }

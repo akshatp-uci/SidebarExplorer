@@ -15,15 +15,15 @@ class WorkspaceViewController: NSViewController {
     
     private let workspaceView: WorkspaceView
     private var workspace: Workspace
-    weak var delegate: WorkspaceViewControllerDelegate?
+    private weak var delegate: WorkspaceViewControllerDelegate?
     
     // MARK: - Initialization
     
-    init(workspace: Workspace) {
+    init(workspace: Workspace, delegate: WorkspaceViewControllerDelegate?) {
         self.workspace = workspace
         self.workspaceView = WorkspaceView(frame: .zero)
         super.init(nibName: nil, bundle: nil)
-        
+        self.delegate = delegate
         workspaceView.dataSource = self
     }
     
@@ -32,13 +32,24 @@ class WorkspaceViewController: NSViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func loadView() {
-        view = workspaceView
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.addSubview(workspaceView)
+        
         workspaceView.delegate = self
+
+        // Ensure the workspace view fills its container
+        workspaceView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            workspaceView.topAnchor.constraint(equalTo: view.topAnchor),
+            workspaceView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            workspaceView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            workspaceView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+    }
+    
+    override func viewDidLayout() {
+        super.viewDidLayout()
         updateView()
     }
     

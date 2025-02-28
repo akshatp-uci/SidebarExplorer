@@ -54,7 +54,7 @@ class ContentView: NSView {
                 <tr>
                     <td align="left">
                         <font face="SF Pro Display, -apple-system, BlinkMacSystemFont" size="3" color="#1d1d1f">
-                            <h1 style="margin: 0 0 9px 0;">Workspace: \(workspace.name)</h1>
+                            <h3 style="margin: 0 0 9px 0;">Workspace: \(workspace.name)</h1>
                         </font>
                         <font face="SF Pro Text, -apple-system, BlinkMacSystemFont" size="2" color="#424245">
                             <p style="margin: 8px 0;">Workspace ID: \(workspace.id)</p>

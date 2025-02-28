@@ -52,13 +52,13 @@ class ContentViewController: NSViewController {
             splitViewController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         
-        let sidebarViewController = SidebarViewController()
+        let sidebarViewController = SidebarViewController(delegate: self)
         let sidebarItem = NSSplitViewItem(sidebarWithViewController: sidebarViewController)
         
         // Configure sidebar behavior
         sidebarItem.canCollapse = true
         sidebarItem.holdingPriority = NSLayoutConstraint.Priority(rawValue: 260)
-        sidebarItem.minimumThickness = 220
+        sidebarItem.minimumThickness = 204
         sidebarItem.maximumThickness = 400
         
         let contentViewController = makeContentViewController()
@@ -69,7 +69,6 @@ class ContentViewController: NSViewController {
         splitViewController.addSplitViewItem(contentItem)
         
         self.splitViewController = splitViewController
-        sidebarViewController.workspaceViewController.delegate = self
     }
     
     private func makeContentViewController() -> NSViewController {
