@@ -67,7 +67,8 @@ class WorkspaceView: NSView {
         // Configure collection view
         pinnedItemCollectionView.translatesAutoresizingMaskIntoConstraints = false
         
-        let flowLayout = NSCollectionViewFlowLayout()
+        // Create a custom flow layout
+        let flowLayout = FixedSpacingFlowLayout()
         flowLayout.scrollDirection = .vertical
         flowLayout.itemSize = NSSize(width: 56, height: 50)
         flowLayout.minimumInteritemSpacing = 8
@@ -173,12 +174,22 @@ class WorkspaceView: NSView {
     }
     
     func updatePinnedItemsArea(_ items: [WorkspaceItem], animated: Bool = true) {
-        let availableWidth = bounds.width - 4
+        // Use the collection view width to determine the number of items per row
+        let flowLayout = pinnedItemCollectionView.collectionViewLayout as? FixedSpacingFlowLayout
+        flowLayout?.invalidateLayout()
+        
+        // Calculate the height needed based on the number of items and the current width
+        let availableWidth = bounds.width
+        let sectionInset = (flowLayout?.sectionInset ?? NSEdgeInsets(top: 8, left: 10, bottom: 8, right: 10))
         let itemWidth: CGFloat = 56
         let itemSpacing: CGFloat = 8
-        let itemsPerRow = max(1, Int((availableWidth - itemSpacing) / (itemWidth + itemSpacing)))
-        let numberOfRows = Int(ceil(Float(items.count) / Float(itemsPerRow)))
-        let totalHeight = items.isEmpty ? 0 : CGFloat(numberOfRows * 58 + 8)
+        let usableWidth = availableWidth - sectionInset.left - sectionInset.right
+        let itemsPerRow = max(1, Int(floor((usableWidth + itemSpacing) / (itemWidth + itemSpacing))))
+        let numberOfRows = items.isEmpty ? 0 : Int(ceil(Double(items.count) / Double(itemsPerRow)))
+        
+        // Calculate the total height needed (item height + spacing + insets)
+        let itemHeight: CGFloat = 50
+        let totalHeight = items.isEmpty ? 0 : CGFloat(numberOfRows) * (itemHeight + (numberOfRows > 1 ? flowLayout?.minimumLineSpacing ?? 8 : 0)) + sectionInset.top + sectionInset.bottom
         
         animateConstraints(
             constants: [(pinnedItemsHeightConstraint, totalHeight)],

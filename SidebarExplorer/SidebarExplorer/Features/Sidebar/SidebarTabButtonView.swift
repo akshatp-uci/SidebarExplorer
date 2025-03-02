@@ -25,6 +25,11 @@ class SidebarTabButtonView: NSView {
     weak var stackView: NSStackView?
     weak var delegate: SidebarTabButtonViewDelegate?
     
+    private var actuallyCollapsedOld: Bool = false
+    private var actuallyCollapsed: Bool {
+        return canCollapse && isCollapsed && !isSelected
+    }
+    
     init(
         workspace: Workspace,
         isSelected: Bool,
@@ -98,16 +103,20 @@ class SidebarTabButtonView: NSView {
     }
     
     override func mouseEntered(with event: NSEvent) {
-        isCollapsed = false
-        update()
+        if isCollapsed {
+            isCollapsed = false
+            update()
+        }
     }
     
     override func mouseExited(with event: NSEvent) {
-        isCollapsed = true
-        update()
+        if !isCollapsed {
+            isCollapsed = true
+            update()
+        }
     }
         
-    func update() {
+    func update(withZoomAnimation: Bool = false) {
         if isSelected {
             button.contentTintColor = NSColor.controlAccentColor
             button.layer?.backgroundColor = .clear
@@ -116,13 +125,28 @@ class SidebarTabButtonView: NSView {
             button.layer?.backgroundColor = .clear
         }
         
-        if canCollapse && isCollapsed && !isSelected {
-            button.image = NSImage(systemSymbolName: "circlebadge.fill", accessibilityDescription: workspace.name)?
-                .withSymbolConfiguration(.init(pointSize: 6, weight: .regular))
-        } else {
-            button.image = NSImage(systemSymbolName: workspace.icon, accessibilityDescription: workspace.name)?
-                .withSymbolConfiguration(.init(pointSize: 14, weight: .regular))
+        if withZoomAnimation {
+            button.pressWithZoomAnimation()
         }
+        
+        guard actuallyCollapsedOld != actuallyCollapsed else { return }
+        
+        NSAnimationContext.runAnimationGroup { _ in
+            let transition = CATransition()
+            transition.type = .fade
+            transition.duration = 0.3
+                
+            button.layer?.add(transition, forKey: "imageTransition")
+                
+            if actuallyCollapsed {
+                button.image = NSImage(systemSymbolName: "circlebadge.fill", accessibilityDescription: workspace.name)?
+                    .withSymbolConfiguration(.init(pointSize: 6, weight: .regular))
+            } else {
+                button.image = NSImage(systemSymbolName: workspace.icon, accessibilityDescription: workspace.name)?
+                    .withSymbolConfiguration(.init(pointSize: 14, weight: .regular))
+            }
+        }
+        actuallyCollapsedOld = actuallyCollapsed
     }
     
     private func setupGestures() {

@@ -126,7 +126,7 @@ class SidebarTabView: NSView {
         updateButtonStates()
         
         NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.1
+            context.duration = 0.3
             context.allowsImplicitAnimation = true
             stackView.layoutSubtreeIfNeeded()
         }
@@ -219,7 +219,7 @@ class SidebarTabView: NSView {
             if button.isSelected {
                 selectedButton = button
             }
-            button.update()
+            button.update(withZoomAnimation: button.isSelected && button.canCollapse)
         }
         
         if let selectedButton = selectedButton,

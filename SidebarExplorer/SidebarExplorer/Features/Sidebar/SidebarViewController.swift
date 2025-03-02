@@ -42,6 +42,7 @@ class SidebarViewController: NSViewController {
         super.viewDidLoad()
         tabView.setupInitialWorkspaces(with: workspacePageController.arrangedObjects as! [Workspace], currentIndex: workspacePageController.selectedIndex)
         workspacePageController.workspacePageControllerDelegate = self
+        self.view.layoutSubtreeIfNeeded()
     }
     
     // MARK: - Private Setup

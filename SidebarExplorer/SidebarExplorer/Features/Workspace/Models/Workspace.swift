@@ -57,8 +57,8 @@ class Workspace: NSObject {
             )
         }
         
-        // Generate random number of pinned items (0-6)
-        let pinnedCount = Int.random(in: 0...6)
+        // Generate random number of pinned items (1-6)
+        let pinnedCount = Int.random(in: 1...6)
         let pinnedItems = (0..<pinnedCount).map { index in
             let pinnedTypes = [
                 ("Quick Access \(index + 1)", "star.fill"),

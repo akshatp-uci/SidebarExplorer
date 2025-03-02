@@ -146,6 +146,8 @@ extension WorkspacePageController: NSPageControllerDelegate {
         previousWorkspaceIndex = currentWorkspaceIndex
         currentWorkspaceIndex = selectedIndex
         
+        pageController.completeTransition()
+        
         // Notify delegate about the workspace change
         workspacePageControllerDelegate?.workspacePageController(self, didSwitchToWorkspace: currentWorkspace)
     }
